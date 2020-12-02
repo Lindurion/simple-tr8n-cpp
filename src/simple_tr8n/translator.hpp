@@ -43,6 +43,7 @@ public:
 
   /** Adds an argument with the given key and value. */
   TransArgs& add(basic_string_view<CharT> key, basic_string_view<CharT> value) {
+    Expects(!has(key));  // No replace support.
     args_.emplace_back(key, value);
     return *this;
   }
@@ -99,6 +100,7 @@ public:
 
   /**
    * Translates the given plural message type, including argument interpolation.
+   * Given pluralCount must be non-negative.
    *
    * Error handling behavior depends on the implementation. For
    * SimpleTranslator, it will throw an exception if this message type is not

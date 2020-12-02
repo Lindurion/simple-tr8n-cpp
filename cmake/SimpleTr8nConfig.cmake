@@ -5,16 +5,20 @@ option(SIMPLE_TR8N_ENABLE_EXCEPTIONS "Enables C++ exceptions for SimpleTr8n" ON)
 mark_as_advanced(SIMPLE_TR8N_ENABLE_EXCEPTIONS)
 
 # simple_tr8n::string_view type:
-set(SIMPLE_TR8N_STRING_VIEW_TYPE "std" CACHE STRING "simple_tr8n::string_view type to use")
+set(SIMPLE_TR8N_STRING_VIEW_TYPE "std" CACHE STRING
+    "simple_tr8n::string_view type to use")
 set_property(CACHE SIMPLE_TR8N_STRING_VIEW_TYPE PROPERTY STRINGS "std" "lite" "custom")
 
-option(SIMPLE_TR8N_STRING_VIEW_CUSTOM_TYPE "Custom type for simple_tr8n::basic_string_view")
+set(SIMPLE_TR8N_STRING_VIEW_CUSTOM_TYPE "" CACHE STRING
+    "Custom type for simple_tr8n::basic_string_view")
 mark_as_advanced(SIMPLE_TR8N_STRING_VIEW_CUSTOM_TYPE)
 
-option(SIMPLE_TR8N_STRING_VIEW_CUSTOM_INCLUDE "Custom include for simple_tr8n::string_view")
+set(SIMPLE_TR8N_STRING_VIEW_CUSTOM_INCLUDE "" CACHE STRING
+    "Custom include for simple_tr8n::basic_string_view")
 mark_as_advanced(SIMPLE_TR8N_STRING_VIEW_CUSTOM_INCLUDE)
 
-option(SIMPLE_TR8N_STRING_VIEW_CUSTOM_TARGET "Custom library target to link for simple_tr8n::string_view")
+set(SIMPLE_TR8N_STRING_VIEW_CUSTOM_TARGET "" CACHE STRING
+    "Custom library target to link for simple_tr8n::basic_string_view")
 mark_as_advanced(SIMPLE_TR8N_STRING_VIEW_CUSTOM_TARGET)
 
 if(SIMPLE_TR8N_STRING_VIEW_TYPE STREQUAL "std")

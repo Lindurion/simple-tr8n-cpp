@@ -33,7 +33,7 @@ MissingMsgTypeException<CharT>::MissingMsgTypeException(basic_string_view<CharT>
 template<>
 MissingMsgTypeException<char>::MissingMsgTypeException(basic_string_view<char> msgType)
     : what_("simple_tr8n::MissingMsgTypeException: ") {
-  what_ += msgType;
+  what_.append(std::basic_string<char>{msgType});
 }
 
 /** Exception thrown if a required message argument was not provided. */
@@ -57,9 +57,9 @@ MissingArgException<CharT>::MissingArgException(basic_string_view<CharT>, basic_
 template<>
 MissingArgException<char>::MissingArgException(basic_string_view<char> msgType, basic_string_view<char> argKey)
     : what_("simple_tr8n::MissingArgException: (msgType) ") {
-  what_ += msgType;
-  what_ += ": (argKey) ";
-  what_ += argKey;
+  what_.append(std::basic_string<char>{msgType});
+  what_.append(": (argKey) ");
+  what_.append(std::basic_string<char>{argKey});
 }
 
 /**
@@ -86,7 +86,7 @@ InvalidArgsException<CharT>::InvalidArgsException(basic_string_view<CharT>)
 template<>
 InvalidArgsException<char>::InvalidArgsException(basic_string_view<char> msgType)
     : what_("simple_tr8n::InvalidArgsException: ") {
-  what_ += msgType;
+  what_.append(std::basic_string<char>{msgType});
 }
 
 }  // namespace simple_tr8n

@@ -1,6 +1,7 @@
 #ifndef SIMPLE_TR8N_STRING_VIEW_HPP
 #define SIMPLE_TR8N_STRING_VIEW_HPP
 
+// Include necessary header for the implementation being aliased.
 #ifdef SIMPLE_TR8N_STRING_VIEW_INCLUDE
 #include SIMPLE_TR8N_STRING_VIEW_INCLUDE
 #endif

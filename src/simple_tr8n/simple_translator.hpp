@@ -22,6 +22,9 @@
 namespace simple_tr8n {
 namespace internal {
 
+/** Count value used to represent a non-plural case. */
+constexpr int kNoCount = -1;
+
 template<typename CharT>
 std::basic_regex<CharT> argPattern();
 
@@ -38,6 +41,12 @@ std::basic_regex<wchar_t> argPattern() {
 // TODO: Provide specializations for additional char types (int16_t, int32_t),
 // if needed.
 
+template<typename CharT>
+const std::basic_string<CharT>& emptyStr() {
+  static std::basic_string<CharT> empty{};
+  return empty;
+}
+
 }  // namespace internal
 
 /** User-visible message value configured for a particular plural count case. */
@@ -45,20 +54,23 @@ template<typename CharT>
 class PluralCase {
 public:
   // Note: Intentionally allowing implicit type conversion syntax.
+  /**
+   * Configures plural case with the given minimum count. The highest matching
+   * (<= actual count) case will be selected.
+   */
   PluralCase(int count, std::basic_string<CharT> msg) : count_{count}, msg_{std::move(msg)} {}
 
+  /** Minimum count for which this case will be selected. */
   int count() const { return count_; }
+
+  /**
+   * User-visible message, possibly containing %{argKey} tokens for
+   * interpolation.
+   */
   const std::basic_string<CharT>& msg() const { return msg_; }
 
 private:
-  /**
-   * Minimum non-negative count for which this case will be selected. If a given
-   * count matches no cases exactly, the nearest case with lower count value
-   * will be selected.
-   */
   int count_;
-
-  /** User-visible message value. */
   std::basic_string<CharT> msg_;
 };
 
@@ -72,7 +84,7 @@ public:
   // Note: Intentionally allowing implicit type conversion syntax.
   /** Configures a message case without any plurals. */
   MsgConfig(basic_string_view<CharT> msg) {
-    cases_.emplace_back(kNoCount, std::basic_string<CharT>{msg});
+    cases_.emplace_back(internal::kNoCount, std::basic_string<CharT>{msg});
   }
 
   // Note: Intentionally allowing implicit type conversion syntax.
@@ -94,7 +106,7 @@ public:
 
   /** Returns true if this message was configured with 1+ plural cases. */
   bool hasPluralCases() const {
-    return (cases_.size() >= 2) || (cases_[0].count() != kNoCount);
+    return (cases_.size() >= 2) || (cases_[0].count() != internal::kNoCount);
   }
 
   /** Returns message value for the only case configured. */
@@ -104,38 +116,28 @@ public:
   }
 
   /** Returns best matching message case value for the given plural count. */
-  const std::basic_string<CharT>& pluralCase(int count) const {
+  const std::basic_string<CharT>& pluralCase(basic_string_view<CharT> msgType, int count) const {
     Expects(count >= 0);
     Expects(hasPluralCases());
 
-    int bestMatchIndex = 0;
-    for (int i = 0; i < cases_.size(); ++i) {
-      if (count < cases_[i].count()) {
-        break;  // Too high, so stop searching.
+    for (int i = gsl::narrow_cast<int>(cases_.size()) - 1; i >= 0; --i) {
+      if (cases_[i].count() <= count) {
+        return cases_[i].msg();
       }
-      bestMatchIndex = i;
     }
 
-    return cases_[bestMatchIndex].msg();
+    // No configured plural case.
+#ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
+    throw InvalidArgsException<CharT>{msgType};
+#else
+    msgType;  // Suppress unreferenced parameter warning.
+    return internal::emptyStr<CharT>();
+#endif
   }
 
 private:
-  static constexpr int kNoCount = -1;
-
   std::vector<PluralCase<CharT>> cases_;  // Invariant: cases_.size() >= 1.
 };
-
-/**
- * Builds a configuration pair of message type and MsgConfig, designed for use
- * with MsgConfigs.
- */
-template<typename CharT>
-std::pair<std::basic_string<CharT>, MsgConfig<CharT>> config(
-    basic_string_view<CharT> msgType,
-    MsgConfig<CharT> msgConfig) {
-  return std::make_pair<std::basic_string<CharT>, MsgConfig<CharT>>(
-      std::basic_string<CharT>{msgType}, std::move(msgConfig));
-}
 
 /** Complete set of translated message configurations for a given locale. */
 template<typename CharT>
@@ -152,23 +154,27 @@ public:
   MsgConfigs(MsgConfigs&&) = delete;
   MsgConfigs& operator=(MsgConfigs&&) = delete;
 
+  /** Adds message with just a single non-plural case. */
   MsgConfigs& add(basic_string_view<CharT> msgType, basic_string_view<CharT> msg) {
     configs_.emplace(msgType, MsgConfig<CharT>{msg});
     return *this;
   }
 
-  MsgConfigs& add(basic_string_view<CharT> msgType, std::initializer_list<PluralCase<CharT>> cases) {
+  /** Adds message with (potentially) multiple plural cases. */
+  MsgConfigs& add(
+      basic_string_view<CharT> msgType, std::initializer_list<PluralCase<CharT>> cases) {
     configs_.emplace(msgType, MsgConfig<CharT>{std::move(cases)});
     return *this;
   }
 
+  /** Accesses the configuration for the given message type. */
   const MsgConfig<CharT>& get(basic_string_view<CharT> msgType) const {
     const auto itr = configs_.find(msgType);
 
     if (itr == configs_.end()) {
       // This message type was not configured.
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
-      throw MissingMsgTypeException{msgType};
+      throw MissingMsgTypeException<CharT>{msgType};
 #else
       return emptyConfig_;
 #endif
@@ -221,7 +227,8 @@ public:
     return msg;
   }
 
-  string_type translate(basic_string_view<CharT> msgType, const TransArgs<CharT>& args) const override {
+  string_type translate(
+      basic_string_view<CharT> msgType, const TransArgs<CharT>& args) const override {
     const auto& config = configs_->get(msgType);
 
     if (config.hasPluralCases()) {
@@ -232,14 +239,16 @@ public:
   }
 
   string_type translatePlural(
-      basic_string_view<CharT> msgType, int pluralCount, const TransArgs<CharT>& args) const override {
+      basic_string_view<CharT> msgType, int pluralCount,
+      const TransArgs<CharT>& args) const override {
+    Expects(pluralCount >= 0);
     const auto& config = configs_->get(msgType);
 
     if (!config.hasPluralCases()) {
       return invalidArgs(msgType);  // Mismatch: must use translate().
     }
 
-    return substituteArgs(msgType, config.pluralCase(pluralCount), args);
+    return substituteArgs(msgType, config.pluralCase(msgType, pluralCount), args);
   }
 
 private:
@@ -247,16 +256,19 @@ private:
 
   static string_type invalidArgs(basic_string_view<CharT> msgType) {
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
-    throw InvalidArgsException{msgType};
+    throw InvalidArgsException<CharT>{msgType};
 #else
+    msgType;  // Suppress unreferenced parameter warning.
     return {};
 #endif
   }
 
   static string_type missingArg(basic_string_view<CharT> msgType, basic_string_view<CharT> argKey) {
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
-    throw MissingArgException{msgType, argKey};
+    throw MissingArgException<CharT>{msgType, argKey};
 #else
+    msgType;  // Suppress unreferenced parameter warning.
+    argKey;  // Suppress unreferenced parameter warning.
     return {};
 #endif
   }
@@ -280,7 +292,7 @@ private:
       }
 
       result.append(match.prefix());
-      result.append(args.get(argKey));
+      result.append(std::basic_string<CharT>{args.get(argKey)});
 
       start += match.position() + match.length();  // Advance past %{argKey} token.
     }
