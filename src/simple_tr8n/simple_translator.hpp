@@ -81,7 +81,7 @@ class MsgConfig {
 public:
   // Note: Intentionally allowing implicit type conversion syntax.
   /** Configures a message case without any plurals. */
-  MsgConfig(string_view<CharT> msg) {
+  MsgConfig(basic_string_view<CharT> msg) {
     cases_.emplace_back(kNoCount, msg);
   }
 
@@ -90,7 +90,7 @@ public:
    * Configures a message with (potentially multiple) plural cases. Input cases
    * must be in ascending count order.
    */
-  MsgConfig(std::initializer_list<PluralCase> cases) : cases_{std::move(cases)} {
+  MsgConfig(std::initializer_list<PluralCase<CharT>> cases) : cases_{std::move(cases)} {
     Expects(cases_.size() >= 1);
   }
 
@@ -140,7 +140,7 @@ template<typename CharT>
 class MsgConfigs {
 public:
   using string_type = std::basic_string<CharT>;
-  using entry_type = std::pair<string_type, MsgConfig>;
+  using entry_type = std::pair<string_type, MsgConfig<CharT>>;
 
   // Note: Intentionally allowing implicit type conversion syntax.
   MsgConfigs(std::initializer_list<entry_type> configs)
@@ -154,7 +154,7 @@ public:
   MsgConfigs(MsgConfigs&&) = delete;
   MsgConfigs& operator=(MsgConfigs&&) = delete;
 
-  const MsgConfig<CharT>& get(string_view<CharT> msgType) const {
+  const MsgConfig<CharT>& get(basic_string_view<CharT> msgType) const {
     const auto itr = configs_.find(msgType);
 
     if (itr == configs_.end()) {
@@ -183,23 +183,70 @@ public:
   SimpleTranslator(std::unique_ptr<MsgConfigs<CharT>> configs)
       : configs_{std::move(configs)} {}
 
-  string_type translate(string_view<CharT> msgType) const override {
+  ~SimpleTranslator() override = default;
+
+  SimpleTranslator(const SimpleTranslator&) = delete;
+  SimpleTranslator& operator=(const SimpleTranslator&) = delete;
+
+  SimpleTranslator(SimpleTranslator&&) = delete;
+  SimpleTranslator& operator=(SimpleTranslator&&) = delete;
+
+  string_type translate(basic_string_view<CharT> msgType) const override {
     const auto& config = configs_->get(msgType);
 
     if (config.hasPluralCases()) {
       return invalidArgs(msgType);  // Mismatch: no args given, but args are required.
     }
 
-    // TODO: Validate that there are no %{} arguments to substitute.
+    const auto& msg = config.onlyCase().value;
+
+    match_type match;
+    if (std::regex_search(msg, match, argPattern_)) {
+      const auto& argKey = match[1];
+      return missingArg(msgType, argKey);
+    }
+
+    return msg;
   }
 
-  string_type translate(string_view<CharT> msgType, const TransArgs<CharT>& args) const override {
+  string_type translate(basic_string_view<CharT> msgType, const TransArgs<CharT>& args) const override {
     const auto& config = configs_->get(msgType);
-    // TODO: Argument substitution/plurals.
+
+    if (config.hasPluralCases() != args.hasCount()) {
+      return invalidArgs(msgType);  // Mismatch: plural vs. non-plural.
+    }
+
+    const auto& msg = config.hasPluralCases()
+        ? config.pluralCase(args.count()).value : config.onlyCase().value;
+    
+    string_type result;
+
+    auto start = msg.begin();
+    const auto end = msg.end();
+
+    match_type match;
+    while (std::regex_search(start, end, match, argPattern_)) {
+      const auto& argKey = match[1];
+
+      if (!args.has(argKey)) {
+        return missingArg(msgType, argKey);  
+      }
+
+      result.append(args.get(argKey));
+
+      start += match.position() + match.length();  // Advance past %{argKey} token.
+    }
+
+    // No arguments matches. Append rest of message.
+    result.append(start, end);
+
+    return result;
   }
 
 private:
-  static string_type invalidArgs(string_view<CharT> msgType) {
+  using match_type = std::match_results<typename std::basic_string<CharT>::const_iterator>;
+
+  static string_type invalidArgs(basic_string_view<CharT> msgType) {
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
     throw InvalidArgsException{msgType};
 #else
@@ -207,8 +254,16 @@ private:
 #endif
   }
 
+  static string_type missingArg(basic_string_view<CharT> msgType, basic_string_view<CharT> argKey) {
+#ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
+    throw MissingArgException{msgType, argKey};
+#else
+    return {};
+#endif
+  }
+
   std::unique_ptr<MsgConfigs<CharT>> configs_;
-  std::basic_regex<CharT> argPattern_ = internal::argPattern<CharT>();
+  const std::basic_regex<CharT> argPattern_ = internal::argPattern<CharT>();
 };
 
 }  // namespace simple_tr8n

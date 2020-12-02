@@ -5,9 +5,9 @@ simple_tr8n_header_library(StringView string_view.hpp)
 
 target_compile_definitions(SimpleTr8n_StringView INTERFACE
     "SIMPLE_TR8N_STRING_VIEW_TYPE=${SIMPLE_TR8N_STRING_VIEW_TYPE}")
-if(SIMPLE_TR8N_STRING_VIEW_INCLUDES)
+if(SIMPLE_TR8N_STRING_VIEW_INCLUDE)
   target_compile_definitions(SimpleTr8n_StringView INTERFACE
-      "SIMPLE_TR8N_STRING_VIEW_INCLUDES=${SIMPLE_TR8N_STRING_VIEW_INCLUDES}")
+      "SIMPLE_TR8N_STRING_VIEW_INCLUDE=${SIMPLE_TR8N_STRING_VIEW_INCLUDE}")
 endif()
 if(SIMPLE_TR8N_STRING_VIEW_TARGET)
   target_link_libraries(SimpleTr8n_StringView INTERFACE "${SIMPLE_TR8N_STRING_VIEW_TARGET}")
@@ -23,6 +23,10 @@ if(SIMPLE_TR8N_ENABLE_EXCEPTIONS)
   target_sources(SimpleTr8n_SimpleTranslator INTERFACE exceptions.hpp)
   target_compile_definitions(SimpleTr8n_SimpleTranslator INTERFACE "SIMPLE_TR8N_ENABLE_EXCEPTIONS")
 endif()
-target_link_libraries(SimpleTranslator INTERFACE SimpleTr8n::API SimpleTr8n::StringView)
+target_link_libraries(SimpleTr8n_SimpleTranslator
+    INTERFACE SimpleTr8n::API SimpleTr8n::StringView)
 
-# TODO: Add test.
+simple_tr8n_gtest(SimpleTranslatorTest simple_translator_test.cpp)
+target_link_libraries(SimpleTr8n_SimpleTranslatorTest
+    PRIVATE SimpleTr8n::SimpleTranslator)
+target_compile_features(SimpleTr8n_SimpleTranslatorTest PUBLIC cxx_std_17)

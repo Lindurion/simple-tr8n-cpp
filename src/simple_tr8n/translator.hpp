@@ -29,14 +29,14 @@ public:
       : args_{std::move(args)} {}
 
   /** Returns true if an argument with the given key has been provided. */
-  bool has(string_view<CharT> key) const {
+  bool has(basic_string_view<CharT> key) const {
     const auto itr = std::find_if(args_.begin(), args_.end(),
         [](const keyval_type& keyval) { return keyval.first() == key; });
     return itr != args_.end();
   }
 
   /** Returns value of argument with given key, or emptry string if none was set. */
-  const string_type& get(string_view<CharT> key) const {
+  const string_type& get(basic_string_view<CharT> key) const {
     auto itr = std::find_if(args_.begin(), args_.end(),
         [](const keyval_type& keyval) { return keyval.first() == key; });
     return (itr != args_.end()) ? *itr : {};
@@ -47,8 +47,14 @@ public:
     return count_ != kNoCount;
   }
 
+  /** Returns plural count argument. */
+  int count() const {
+    Expects(hasCount());
+    return count_;
+  }
+
   /** Adds an argument with the given key and value. */
-  TransArgs& add(string_view<CharT> key, string_view<CharT> value) {
+  TransArgs& add(basic_string_view<CharT> key, basic_string_view<CharT> value) {
     args_.emplace_back(key, value);
     return *this;
   }
@@ -93,7 +99,7 @@ public:
    * compiled with SIMPLE_TR8N_ENABLE_EXCEPTIONS off, in which case it will
    * return an empty string).
    */
-  virtual string_type translate(string_view<CharT> msgType) const = 0;
+  virtual string_type translate(basic_string_view<CharT> msgType) const = 0;
 
   /**
    * Translates the given message type, including argument interpolation and
@@ -107,7 +113,7 @@ public:
    *
    * Unused arguments are okay and should not result in an error.
    */
-  virtual string_type translate(string_view<CharT> msgType, const TransArgs<CharT>& args) const = 0;
+  virtual string_type translate(basic_string_view<CharT> msgType, const TransArgs<CharT>& args) const = 0;
 };
 
 }  // namespace simple_tr8n

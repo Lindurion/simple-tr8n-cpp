@@ -16,7 +16,7 @@ namespace simple_tr8n {
 template<typename CharT>
 struct MissingMsgTypeException : public std::exception {
 public:
-  MissingMsgTypeException(string_view<CharT> msgType);
+  MissingMsgTypeException(basic_string_view<CharT> msgType);
   ~MissingMsgTypeException() override = default;
   const char* what() const noexcept override { return what_.c_str(); }
 
@@ -26,12 +26,12 @@ private:
 
 // Default: just include exception name in what() explanation.
 template<typename CharT>
-MissingMsgTypeException<CharT>::MissingMsgTypeException(string_view<CharT>)
+MissingMsgTypeException<CharT>::MissingMsgTypeException(basic_string_view<CharT>)
     : what_("simple_tr8n::MissingMsgTypeException") {}
 
 // TODO: Specialize for other character types if needed.
 template<>
-MissingMsgTypeException<char>::MissingMsgTypeException(string_view<char> msgType)
+MissingMsgTypeException<char>::MissingMsgTypeException(basic_string_view<char> msgType)
     : what_("simple_tr8n::MissingMsgTypeException: ") {
   what_ += msgType;
 }
@@ -40,7 +40,7 @@ MissingMsgTypeException<char>::MissingMsgTypeException(string_view<char> msgType
 template<typename CharT>
 struct MissingArgException : public std::exception {
 public:
-  MissingArgException(string_view<CharT> msgType, string_view<CharT> argKey);
+  MissingArgException(basic_string_view<CharT> msgType, basic_string_view<CharT> argKey);
   ~MissingArgException() override = default;
   const char* what() const noexcept override { return what_.c_str(); }
 
@@ -50,12 +50,12 @@ private:
 
 // Default: just include exception name in what() explanation.
 template<typename CharT>
-MissingArgException<CharT>::MissingArgException(string_view<CharT>, string_view<CharT>)
+MissingArgException<CharT>::MissingArgException(basic_string_view<CharT>, basic_string_view<CharT>)
     : what_("simple_tr8n::MissingArgException") {}
 
 // TODO: Specialize for other character types if needed.
 template<>
-MissingArgException<char>::MissingArgException(string_view<char> msgType, string_view<char> argKey)
+MissingArgException<char>::MissingArgException(basic_string_view<char> msgType, basic_string_view<char> argKey)
     : what_("simple_tr8n::MissingArgException: (msgType) ") {
   what_ += msgType;
   what_ += ": (argKey) ";
@@ -69,7 +69,7 @@ MissingArgException<char>::MissingArgException(string_view<char> msgType, string
 template<typename CharT>
 struct InvalidArgsException : public std::exception {
 public:
-  InvalidArgsException(string_view<CharT> msgType);
+  InvalidArgsException(basic_string_view<CharT> msgType);
   ~InvalidArgsException() override = default;
   const char* what() const noexcept override { return what_.c_str(); }
 
@@ -79,12 +79,12 @@ private:
 
 // Default: just include exception name in what() explanation.
 template<typename CharT>
-InvalidArgsException<CharT>::InvalidArgsException(string_view<CharT>)
+InvalidArgsException<CharT>::InvalidArgsException(basic_string_view<CharT>)
     : what_("simple_tr8n::InvalidArgsException") {}
 
 // TODO: Specialize for other character types if needed.
 template<>
-InvalidArgsException<char>::InvalidArgsException(string_view<char> msgType, string_view<char> argKey)
+InvalidArgsException<char>::InvalidArgsException(basic_string_view<char> msgType)
     : what_("simple_tr8n::InvalidArgsException: ") {
   what_ += msgType;
 }
