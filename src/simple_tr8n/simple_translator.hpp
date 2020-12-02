@@ -2,10 +2,11 @@
 #define SIMPLE_TR8N_SIMPLE_TRANSLATOR_HPP
 
 #include <initializer_list>
+#include <functional>
+#include <map>
 #include <memory>
 #include <regex>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -39,26 +40,15 @@ std::basic_regex<wchar_t> argPattern() {
 
 }  // namespace internal
 
-/**
- * User-visible message value, optionally containing %{argKey} format argument
- * placeholders to be interpolated.
- */
-template<typename CharT>
-struct Message {
-  std::basic_string<CharT> value;
-};
-
 /** User-visible message value configured for a particular plural count case. */
 template<typename CharT>
 class PluralCase {
 public:
   // Note: Intentionally allowing implicit type conversion syntax.
-  PluralCase(int count, Message<CharT> msg) : count(count), msg(msg) {
-    Expects(count >= 0);
-  }
+  PluralCase(int count, std::basic_string<CharT> msg) : count_{count}, msg_{std::move(msg)} {}
 
   int count() const { return count_; }
-  const Message<CharT>& msg() const { return msg_; }
+  const std::basic_string<CharT>& msg() const { return msg_; }
 
 private:
   /**
@@ -69,12 +59,12 @@ private:
   int count_;
 
   /** User-visible message value. */
-  Message<CharT> msg_;
+  std::basic_string<CharT> msg_;
 };
 
 /**
  * Configuration for a single particular message type, which can either be
- * specified as a single case Message or a list of PluralCase values.
+ * specified as a single case message or a list of PluralCase values.
  */
 template<typename CharT>
 class MsgConfig {
@@ -82,7 +72,7 @@ public:
   // Note: Intentionally allowing implicit type conversion syntax.
   /** Configures a message case without any plurals. */
   MsgConfig(basic_string_view<CharT> msg) {
-    cases_.emplace_back(kNoCount, msg);
+    cases_.emplace_back(kNoCount, std::basic_string<CharT>{msg});
   }
 
   // Note: Intentionally allowing implicit type conversion syntax.
@@ -108,13 +98,13 @@ public:
   }
 
   /** Returns message value for the only case configured. */
-  const Message<CharT>& onlyCase() const {
+  const std::basic_string<CharT>& onlyCase() const {
     Expects(!hasPluralCases());
     return cases_[0].msg();
   }
 
   /** Returns best matching message case value for the given plural count. */
-  const Message<CharT>& pluralCase(int count) const {
+  const std::basic_string<CharT>& pluralCase(int count) const {
     Expects(count >= 0);
     Expects(hasPluralCases());
 
@@ -135,17 +125,25 @@ private:
   std::vector<PluralCase<CharT>> cases_;  // Invariant: cases_.size() >= 1.
 };
 
+/**
+ * Builds a configuration pair of message type and MsgConfig, designed for use
+ * with MsgConfigs.
+ */
+template<typename CharT>
+std::pair<std::basic_string<CharT>, MsgConfig<CharT>> config(
+    basic_string_view<CharT> msgType,
+    MsgConfig<CharT> msgConfig) {
+  return std::make_pair<std::basic_string<CharT>, MsgConfig<CharT>>(
+      std::basic_string<CharT>{msgType}, std::move(msgConfig));
+}
+
 /** Complete set of translated message configurations for a given locale. */
 template<typename CharT>
 class MsgConfigs {
 public:
   using string_type = std::basic_string<CharT>;
-  using entry_type = std::pair<string_type, MsgConfig<CharT>>;
 
-  // Note: Intentionally allowing implicit type conversion syntax.
-  MsgConfigs(std::initializer_list<entry_type> configs)
-      : configs_{std::move(configs)} {}
-
+  MsgConfigs() = default;
   ~MsgConfigs() = default;
 
   MsgConfigs(const MsgConfigs&) = delete;
@@ -153,6 +151,16 @@ public:
 
   MsgConfigs(MsgConfigs&&) = delete;
   MsgConfigs& operator=(MsgConfigs&&) = delete;
+
+  MsgConfigs& add(basic_string_view<CharT> msgType, basic_string_view<CharT> msg) {
+    configs_.emplace(msgType, MsgConfig<CharT>{msg});
+    return *this;
+  }
+
+  MsgConfigs& add(basic_string_view<CharT> msgType, std::initializer_list<PluralCase<CharT>> cases) {
+    configs_.emplace(msgType, MsgConfig<CharT>{std::move(cases)});
+    return *this;
+  }
 
   const MsgConfig<CharT>& get(basic_string_view<CharT> msgType) const {
     const auto itr = configs_.find(msgType);
@@ -165,11 +173,15 @@ public:
       return emptyConfig_;
 #endif
     }
+
+    return itr->second;
   }
 
 private:
-  std::unordered_map<string_type, MsgConfig<CharT>> configs_;
-  MsgConfig<CharT> emptyConfig_;
+  // Note: Using transparent comparator std::less<> to support heterogeneous
+  // lookup by string_view without key type conversion.
+  std::map<string_type, MsgConfig<CharT>, std::less<>> configs_;
+  MsgConfig<CharT> emptyConfig_ {string_type{}};
 };
 
 /**
@@ -195,14 +207,14 @@ public:
     const auto& config = configs_->get(msgType);
 
     if (config.hasPluralCases()) {
-      return invalidArgs(msgType);  // Mismatch: no args given, but args are required.
+      return invalidArgs(msgType);  // Mismatch: must use translatePlural().
     }
 
-    const auto& msg = config.onlyCase().value;
+    const auto& msg = config.onlyCase();
 
     match_type match;
     if (std::regex_search(msg, match, argPattern_)) {
-      const auto& argKey = match[1];
+      const std::basic_string<CharT> argKey = match[1];
       return missingArg(msgType, argKey);
     }
 
@@ -212,35 +224,22 @@ public:
   string_type translate(basic_string_view<CharT> msgType, const TransArgs<CharT>& args) const override {
     const auto& config = configs_->get(msgType);
 
-    if (config.hasPluralCases() != args.hasCount()) {
-      return invalidArgs(msgType);  // Mismatch: plural vs. non-plural.
+    if (config.hasPluralCases()) {
+      return invalidArgs(msgType);  // Mismatch: must use translatePlural().
     }
 
-    const auto& msg = config.hasPluralCases()
-        ? config.pluralCase(args.count()).value : config.onlyCase().value;
-    
-    string_type result;
+    return substituteArgs(msgType, config.onlyCase(), args);
+  }
 
-    auto start = msg.begin();
-    const auto end = msg.end();
+  string_type translatePlural(
+      basic_string_view<CharT> msgType, int pluralCount, const TransArgs<CharT>& args) const override {
+    const auto& config = configs_->get(msgType);
 
-    match_type match;
-    while (std::regex_search(start, end, match, argPattern_)) {
-      const auto& argKey = match[1];
-
-      if (!args.has(argKey)) {
-        return missingArg(msgType, argKey);  
-      }
-
-      result.append(args.get(argKey));
-
-      start += match.position() + match.length();  // Advance past %{argKey} token.
+    if (!config.hasPluralCases()) {
+      return invalidArgs(msgType);  // Mismatch: must use translate().
     }
 
-    // No arguments matches. Append rest of message.
-    result.append(start, end);
-
-    return result;
+    return substituteArgs(msgType, config.pluralCase(pluralCount), args);
   }
 
 private:
@@ -260,6 +259,35 @@ private:
 #else
     return {};
 #endif
+  }
+
+  string_type substituteArgs(
+      basic_string_view<CharT> msgType, const std::basic_string<CharT>& msg,
+      const TransArgs<CharT>& args) const {
+    // TODO: If needed, could improve efficiency here by reserving capacity
+    // necessary to fit msg and argument values (TransArgs could track sum of lengths).
+    string_type result;
+
+    auto start = msg.begin();
+    const auto end = msg.end();
+
+    match_type match;
+    while (std::regex_search(start, end, match, argPattern_)) {
+      const std::basic_string<CharT> argKey = match[1];
+
+      if (!args.has(argKey)) {
+        return missingArg(msgType, argKey);  
+      }
+
+      result.append(match.prefix());
+      result.append(args.get(argKey));
+
+      start += match.position() + match.length();  // Advance past %{argKey} token.
+    }
+
+    // No more arguments matches. Append rest of message.
+    result.append(start, end);
+    return result;
   }
 
   std::unique_ptr<MsgConfigs<CharT>> configs_;
