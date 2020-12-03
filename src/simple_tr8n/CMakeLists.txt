@@ -2,9 +2,12 @@ include(SimpleTr8nTargets)
 
 # StringView: alias for std::basic_string_view or an equivalent type.
 simple_tr8n_header_library(StringView string_view.hpp)
+if(SIMPLE_TR8N_STRING_VIEW_TYPE STREQUAL "std")
+  target_compile_features(SimpleTr8n_StringView INTERFACE cxx_std_17)
+endif()
 
 target_compile_definitions(SimpleTr8n_StringView INTERFACE
-    "SIMPLE_TR8N_STRING_VIEW_TYPE=${SIMPLE_TR8N_STRING_VIEW_TYPE}")
+    "SIMPLE_TR8N_BASIC_STRING_VIEW_TYPE=${SIMPLE_TR8N_BASIC_STRING_VIEW_TYPE}")
 if(SIMPLE_TR8N_STRING_VIEW_INCLUDE)
   target_compile_definitions(SimpleTr8n_StringView INTERFACE
       "SIMPLE_TR8N_STRING_VIEW_INCLUDE=${SIMPLE_TR8N_STRING_VIEW_INCLUDE}")
@@ -32,5 +35,4 @@ if(SIMPLE_TR8N_ENABLE_TESTS)
   simple_tr8n_gtest(SimpleTranslatorTest simple_translator_test.cpp)
   target_link_libraries(SimpleTr8n_SimpleTranslatorTest
       PRIVATE SimpleTr8n::SimpleTranslator)
-  target_compile_features(SimpleTr8n_SimpleTranslatorTest PUBLIC cxx_std_17)
 endif()
