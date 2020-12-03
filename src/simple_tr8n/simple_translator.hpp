@@ -29,12 +29,12 @@ template<typename CharT>
 std::basic_regex<CharT> argPattern();
 
 template<>
-std::basic_regex<char> argPattern() {
+inline std::basic_regex<char> argPattern() {
   return std::basic_regex<char>("%\\{(.*?)\\}");
 }
 
 template<>
-std::basic_regex<wchar_t> argPattern() {
+inline std::basic_regex<wchar_t> argPattern() {
   return std::basic_regex<wchar_t>(L"%\\{(.*?)\\}");
 }
 

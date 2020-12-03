@@ -31,7 +31,7 @@ MissingMsgTypeException<CharT>::MissingMsgTypeException(basic_string_view<CharT>
 
 // TODO: Specialize for other character types if needed.
 template<>
-MissingMsgTypeException<char>::MissingMsgTypeException(basic_string_view<char> msgType)
+inline MissingMsgTypeException<char>::MissingMsgTypeException(basic_string_view<char> msgType)
     : what_("simple_tr8n::MissingMsgTypeException: ") {
   what_.append(std::basic_string<char>{msgType});
 }
@@ -55,7 +55,8 @@ MissingArgException<CharT>::MissingArgException(basic_string_view<CharT>, basic_
 
 // TODO: Specialize for other character types if needed.
 template<>
-MissingArgException<char>::MissingArgException(basic_string_view<char> msgType, basic_string_view<char> argKey)
+inline MissingArgException<char>::MissingArgException(
+    basic_string_view<char> msgType, basic_string_view<char> argKey)
     : what_("simple_tr8n::MissingArgException: (msgType) ") {
   what_.append(std::basic_string<char>{msgType});
   what_.append(": (argKey) ");
@@ -84,7 +85,7 @@ InvalidArgsException<CharT>::InvalidArgsException(basic_string_view<CharT>)
 
 // TODO: Specialize for other character types if needed.
 template<>
-InvalidArgsException<char>::InvalidArgsException(basic_string_view<char> msgType)
+inline InvalidArgsException<char>::InvalidArgsException(basic_string_view<char> msgType)
     : what_("simple_tr8n::InvalidArgsException: ") {
   what_.append(std::basic_string<char>{msgType});
 }
