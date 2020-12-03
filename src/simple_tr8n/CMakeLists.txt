@@ -26,9 +26,11 @@ endif()
 target_link_libraries(SimpleTr8n_SimpleTranslator
     INTERFACE SimpleTr8n::API SimpleTr8n::StringView)
 
-# Note: Only testing with C++17 std::basic_string_view and exceptions enabled
-# by default. Can manually test other configurations as needed.
-simple_tr8n_gtest(SimpleTranslatorTest simple_translator_test.cpp)
-target_link_libraries(SimpleTr8n_SimpleTranslatorTest
-    PRIVATE SimpleTr8n::SimpleTranslator)
-target_compile_features(SimpleTr8n_SimpleTranslatorTest PUBLIC cxx_std_17)
+if(SIMPLE_TR8N_ENABLE_TESTS)
+  # Note: Only testing with C++17 std::basic_string_view and exceptions enabled
+  # by default. Can manually test other configurations as needed.
+  simple_tr8n_gtest(SimpleTranslatorTest simple_translator_test.cpp)
+  target_link_libraries(SimpleTr8n_SimpleTranslatorTest
+      PRIVATE SimpleTr8n::SimpleTranslator)
+  target_compile_features(SimpleTr8n_SimpleTranslatorTest PUBLIC cxx_std_17)
+endif()

@@ -64,7 +64,8 @@ endfunction()
 ## All remaining arguments are passed to add_executable().
 function(simple_tr8n_gtest name)
   if(NOT SIMPLE_TR8N_ENABLE_TESTS)
-    return()
+    # Project testing off, so simple_tr8n_gtest() should never have been invoked.
+    message(FATAL_ERROR "Must guard test targets with SIMPLE_TR8N_ENABLE_TESTS")
   endif()
 
   include(GoogleTest)
