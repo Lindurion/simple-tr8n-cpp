@@ -72,5 +72,6 @@
     "xutility": "cpp",
     "pointers": "cpp",
     "random": "cpp"
-  }
+  },
+  "cmake.configureOnOpen": true
 }

@@ -198,7 +198,7 @@ private:
 template<typename CharT>
 class SimpleTranslator : public Translator<CharT> {
 public:
-  using string_type = Translator<CharT>::string_type;
+  using string_type = typename Translator<CharT>::string_type;
 
   SimpleTranslator(std::unique_ptr<MsgConfigs<CharT>> configs)
       : configs_{std::move(configs)} {}
