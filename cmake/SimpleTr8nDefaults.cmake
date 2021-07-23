@@ -1,13 +1,24 @@
 if(NOT SIMPLE_TR8N_IS_TOP_LEVEL_PROJECT)
+  if(CMAKE_CXX_STANDARD LESS 14)
+    message(FATAL_ERROR
+        "SimpleTr8n requires CMAKE_CXX_STANDARD >= 14 (got: ${CMAKE_CXX_STANDARD})")
+  endif()
+
   return()  # Don't set these defaults if this isn't the top-level project.
 endif()
 
+# The defaults below apply only when SimpleTr8n is the top-level CMake project
+# (i.e. when developing it directly as opposed to using it as a library within
+# another project).
+
 include(CheckCXXCompilerFlag)
 
-# Default to C++14 standard.
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED YES)
-set(CMAKE_CXX_EXTENSIONS NO)
+# C++ standard is determined by string_view type.
+if(SIMPLE_TR8N_STRING_VIEW_TYPE STREQUAL "std")
+  set(CMAKE_CXX_STANDARD 17)  # std::string_view requires C++17 minimum.
+else()
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 
 # Default all compilers to hiding symbols by default.
 set(CMAKE_C_VISIBILITY_PRESET hidden)
