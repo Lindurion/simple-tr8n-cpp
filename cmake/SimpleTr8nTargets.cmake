@@ -10,7 +10,7 @@ function(simple_tr8n_header_library name)
   add_library(SimpleTr8n_${name} INTERFACE)
   add_library(SimpleTr8n::${name} ALIAS SimpleTr8n_${name})
   set_target_properties(SimpleTr8n_${name} PROPERTIES
-      EXPORT_NAME ${name})
+      EXPORT_NAME SimpleTr8n_${name})
 
   target_sources(SimpleTr8n_${name} INTERFACE ${ARGN})
 
