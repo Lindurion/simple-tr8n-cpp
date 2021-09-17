@@ -44,8 +44,8 @@ function(simple_tr8n_library name)
   add_library(SimpleTr8n_${name} ${ARGN})
   add_library(SimpleTr8n::${name} ALIAS SimpleTr8n_${name})
   set_target_properties(SimpleTr8n_${name} PROPERTIES
-      OUTPUT_NAME ${name}
-      EXPORT_NAME ${name})
+      OUTPUT_NAME SimpleTr8n_${name}
+      EXPORT_NAME SimpleTr8n_${name})
 
   # Always include the src/ dir as a base include path.
   target_include_directories(SimpleTr8n_${name}
