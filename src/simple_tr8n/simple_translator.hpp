@@ -130,7 +130,7 @@ public:
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
     throw InvalidArgsException<CharT>{msgType};
 #else
-    msgType;  // Suppress unreferenced parameter warning.
+    static_cast<void>(msgType);  // Suppress unreferenced parameter warning.
     return internal::emptyStr<CharT>();
 #endif
   }
@@ -260,7 +260,7 @@ private:
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
     throw InvalidArgsException<CharT>{msgType};
 #else
-    msgType;  // Suppress unreferenced parameter warning.
+    static_cast<void>(msgType);  // Suppress unreferenced parameter warning.
     return {};
 #endif
   }
@@ -269,8 +269,8 @@ private:
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
     throw MissingArgException<CharT>{msgType, argKey};
 #else
-    msgType;  // Suppress unreferenced parameter warning.
-    argKey;  // Suppress unreferenced parameter warning.
+    static_cast<void>(msgType);  // Suppress unreferenced parameter warning.
+    static_cast<void>(argKey);  // Suppress unreferenced parameter warning.
     return {};
 #endif
   }
