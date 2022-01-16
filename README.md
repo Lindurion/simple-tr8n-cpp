@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2022 Eric Barndollar
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # simple-tr8n-cpp
 Really simple C++ header-only library for translating user-facing messages.
 Designed for C++ libraries that don't want to require their client applications
@@ -154,3 +160,13 @@ that can be customized.
 * `SIMPLE_TR8N_STRING_VIEW_CUSTOM_TYPE`: *e.g.* `your_library::basic_string_view`
 * `SIMPLE_TR8N_STRING_VIEW_CUSTOM_INCLUDE`: *e.g.* `<your_library/basic_string_view.hpp>`
 * `SIMPLE_TR8N_STRING_VIEW_CUSTOM_TARGET`: CMake target, *e.g.* `your_library::string_view`
+
+
+## Licenses
+This is free open source software. The code in this project is made available
+under the [Apache-2.0](LICENSES/Apache-2.0.txt) license. See
+[ThirdPartyNotices.txt](ThirdPartyNotices.txt) for license information about the
+software libraries, assets, and tools this project depends upon.
+
+Source files and `LICENSES/` are annotated and checked using
+[reuse.software](https://reuse.software/) tools.

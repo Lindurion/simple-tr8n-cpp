@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Eric Barndollar
+#
+# SPDX-License-Identifier: Apache-2.0
+
 include(FetchContent)
 
 ## Like FetchContent_MakeAvailable, but adds EXCLUDE_FROM_ALL when invoking

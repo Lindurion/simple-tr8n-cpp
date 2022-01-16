@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Eric Barndollar
+#
+# SPDX-License-Identifier: Apache-2.0
+
 include(SimpleTr8nTargets)
 
 # StringView: alias for std::basic_string_view or an equivalent type.

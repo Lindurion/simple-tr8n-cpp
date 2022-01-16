@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Eric Barndollar
+#
+# SPDX-License-Identifier: Apache-2.0
+
 include(GNUInstallDirs)
 
 ## Adds header-only library with SimpleTr8n project defaults.

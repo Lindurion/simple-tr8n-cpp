@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Eric Barndollar
+//
+// SPDX-License-Identifier: Apache-2.0
+
 #ifndef SIMPLE_TR8N_STRING_VIEW_HPP
 #define SIMPLE_TR8N_STRING_VIEW_HPP
 
