@@ -7,14 +7,14 @@
 
 // Include necessary header for the implementation being aliased.
 #ifdef SIMPLE_TR8N_STRING_VIEW_INCLUDE
-#include SIMPLE_TR8N_STRING_VIEW_INCLUDE
+  #include SIMPLE_TR8N_STRING_VIEW_INCLUDE
 #endif
 
 namespace simple_tr8n {
 
 #ifndef SIMPLE_TR8N_BASIC_STRING_VIEW_TYPE
 
-#error "SIMPLE_TR8N_BASIC_STRING_VIEW_TYPE must be defined"
+  #error "SIMPLE_TR8N_BASIC_STRING_VIEW_TYPE must be defined"
 
 #else
 

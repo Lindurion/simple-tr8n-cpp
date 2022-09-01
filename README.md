@@ -5,6 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # simple-tr8n-cpp
+
 Really simple C++ header-only library for translating user-facing messages.
 Designed for C++ libraries that don't want to require their client applications
 to use any specific heavyweight i18n framework.
@@ -12,6 +13,7 @@ to use any specific heavyweight i18n framework.
 Places all translation operations behind the `Translator` interface (declared
 [here](src/simple_tr8n/translator.hpp)). Clients of your library then have two
 options:
+
 1. Use the provided `SimpleTranslator` implementation.
 2. Provide their own implementation of `Translator`, which can then delegate to
    whichever i18n framework they choose.
@@ -72,8 +74,8 @@ constexpr char kExampleMsgA[] = "your_project.a";
 constexpr char kExampleMsgB[] = "your_project.b";
 // ...
 
-}
-}
+}  // namespace msgs
+}  // namespace your_project
 ```
 
 Define default language translations (or configure a tool to generate them),
@@ -90,7 +92,6 @@ enConfig->add(msgs::kExampleMsgA, "%{userFirstName} is %{userAge} years old")
       {2, "You have %{emailCount} new email messages"},
     });
     // ...
-};
 ```
 
 <u>Tip</u>: If you want to allow clients of your library to use their own
@@ -152,17 +153,17 @@ See [SimpleTr8nConfig.cmake](src/cmake/SimpleTr8nConfig.cmake) for CMake variabl
 that can be customized.
 
 * `SIMPLE_TR8N_ENABLE_EXCEPTIONS`: Enable C++ exceptions support?
-    * If disabled, library will return empty strings instead of throwing exceptions.
+  * If disabled, library will return empty strings instead of throwing exceptions.
 * `SIMPLE_TR8N_STRING_VIEW_TYPE`: Controls version of `basic_string_view`.
-    * `std` (default): Use `std::basic_string_view`, which requires C++17.
-    * `lite`: Use `string-view-lite` library for a C++14 compatible version.
-    * `custom`: Manually specify a different implementation (see below).
+  * `std` (default): Use `std::basic_string_view`, which requires C++17.
+  * `lite`: Use `string-view-lite` library for a C++14 compatible version.
+  * `custom`: Manually specify a different implementation (see below).
 * `SIMPLE_TR8N_STRING_VIEW_CUSTOM_TYPE`: *e.g.* `your_library::basic_string_view`
 * `SIMPLE_TR8N_STRING_VIEW_CUSTOM_INCLUDE`: *e.g.* `<your_library/basic_string_view.hpp>`
 * `SIMPLE_TR8N_STRING_VIEW_CUSTOM_TARGET`: CMake target, *e.g.* `your_library::string_view`
 
-
 ## Licenses
+
 This is free open source software. The code in this project is made available
 under the [Apache-2.0](LICENSES/Apache-2.0.txt) license. See
 [ThirdPartyNotices.txt](ThirdPartyNotices.txt) for license information about the

@@ -6,7 +6,7 @@
 #define SIMPLE_TR8N_EXCEPTIONS_HPP
 
 #ifndef SIMPLE_TR8N_ENABLE_EXCEPTIONS
-#error "should not include simple_tr8n/exceptions.hpp without SIMPLE_TR8N_ENABLE_EXCEPTIONS"
+  #error "should not include simple_tr8n/exceptions.hpp without SIMPLE_TR8N_ENABLE_EXCEPTIONS"
 #endif  // SIMPLE_TR8N_ENABLE_EXCEPTIONS
 
 #include <exception>

@@ -1,0 +1,19 @@
+---
+BasedOnStyle: Google
+ColumnLimit: 100
+IndentWidth: 2
+---
+Language: Cpp
+AccessModifierOffset: -2
+AlignAfterOpenBracket: AlwaysBreak
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Attach
+BreakBeforeTernaryOperators: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+IncludeBlocks: Preserve
+IndentPPDirectives: BeforeHash
+NamespaceIndentation: None
+PackConstructorInitializers: BinPack
+SpaceAfterTemplateKeyword: false
+...

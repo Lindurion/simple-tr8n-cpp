@@ -71,7 +71,16 @@
     "xtree": "cpp",
     "xutility": "cpp",
     "pointers": "cpp",
-    "random": "cpp"
+    "random": "cpp",
+    "bit": "cpp",
+    "charconv": "cpp",
+    "clocale": "cpp",
+    "complex": "cpp",
+    "format": "cpp",
+    "mutex": "cpp",
+    "span": "cpp",
+    "stop_token": "cpp",
+    "thread": "cpp"
   },
   "cmake.configureOnOpen": true
 }

@@ -28,20 +28,19 @@ public:
   using keyval_type = std::pair<basic_string_view<CharT>, basic_string_view<CharT>>;
 
   TransArgs() = default;
-  TransArgs(std::initializer_list<keyval_type> args)
-      : args_{std::move(args)} {}
+  TransArgs(std::initializer_list<keyval_type> args) : args_{std::move(args)} {}
 
   /** Returns true if an argument with the given key has been provided. */
   bool has(basic_string_view<CharT> key) const {
-    const auto itr = std::find_if(args_.begin(), args_.end(),
-        [&](const keyval_type& keyval) { return keyval.first == key; });
+    const auto itr = std::find_if(
+        args_.begin(), args_.end(), [&](const keyval_type& keyval) { return keyval.first == key; });
     return itr != args_.end();
   }
 
   /** Returns value of argument with given key, or emptry string if none was set. */
   basic_string_view<CharT> get(basic_string_view<CharT> key) const {
-    auto itr = std::find_if(args_.begin(), args_.end(),
-        [&](const keyval_type& keyval) { return keyval.first == key; });
+    auto itr = std::find_if(
+        args_.begin(), args_.end(), [&](const keyval_type& keyval) { return keyval.first == key; });
     return (itr != args_.end()) ? itr->second : basic_string_view<CharT>{};
   }
 

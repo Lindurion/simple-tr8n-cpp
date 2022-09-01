@@ -5,8 +5,8 @@
 #ifndef SIMPLE_TR8N_SIMPLE_TRANSLATOR_HPP
 #define SIMPLE_TR8N_SIMPLE_TRANSLATOR_HPP
 
-#include <initializer_list>
 #include <functional>
+#include <initializer_list>
 #include <map>
 #include <memory>
 #include <regex>
@@ -20,7 +20,7 @@
 #include "simple_tr8n/translator.hpp"
 
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
-#include "simple_tr8n/exceptions.hpp"
+  #include "simple_tr8n/exceptions.hpp"
 #endif
 
 namespace simple_tr8n {
@@ -191,7 +191,7 @@ private:
   // Note: Using transparent comparator std::less<> to support heterogeneous
   // lookup by string_view without key type conversion.
   std::map<string_type, MsgConfig<CharT>, std::less<>> configs_;
-  MsgConfig<CharT> emptyConfig_ {string_type{}};
+  MsgConfig<CharT> emptyConfig_{string_type{}};
 };
 
 /**
@@ -204,8 +204,7 @@ class SimpleTranslator : public Translator<CharT> {
 public:
   using string_type = typename Translator<CharT>::string_type;
 
-  SimpleTranslator(std::unique_ptr<MsgConfigs<CharT>> configs)
-      : configs_{std::move(configs)} {}
+  SimpleTranslator(std::unique_ptr<MsgConfigs<CharT>> configs) : configs_{std::move(configs)} {}
 
   ~SimpleTranslator() override = default;
 
@@ -274,7 +273,7 @@ private:
     throw MissingArgException<CharT>{msgType, argKey};
 #else
     static_cast<void>(msgType);  // Suppress unreferenced parameter warning.
-    static_cast<void>(argKey);  // Suppress unreferenced parameter warning.
+    static_cast<void>(argKey);   // Suppress unreferenced parameter warning.
     return {};
 #endif
   }
@@ -294,7 +293,7 @@ private:
       const std::basic_string<CharT> argKey = match[1];
 
       if (!args.has(argKey)) {
-        return missingArg(msgType, argKey);  
+        return missingArg(msgType, argKey);
       }
 
       result.append(match.prefix());
