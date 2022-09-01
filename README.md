@@ -140,12 +140,17 @@ const msgB = translator->translatePlural(msgs::kExampleMsgB, 3, {
 This library supports C++14 and above. By default, however, it requires C++17
 to support `std::basic_string_view`.
 
-Libraries this one depends on (via `FetchContent`):
+Libraries this one depends on (automatically downloaded during build via
+[CPM.cmake](https://github.com/cpm-cmake/CPM.cmake), which is a wrapper around `FetchContent`):
 
 * [microsoft/GSL: C++ Guidelines Support Library](https://github.com/microsoft/GSL)
 * [martinmoene/string-view-lite](https://github.com/martinmoene/string-view-lite):
     optional dependency for a C++14 compatible version of `std::basic_string_view`.
 * [google/googletest](https://github.com/google/googletest): for tests only.
+
+If you need to manage dependencies another way (*e.g.* using `vcpkg`, `conan`, or manually
+downloading all 3rd party libraries and checking them into your own company repositories), you can
+disable automatic dependency downloads by defining `CPM_USE_LOCAL_PACKAGES` when running `cmake`.
 
 ## CMake Build Customization
 

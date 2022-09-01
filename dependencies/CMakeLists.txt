@@ -5,6 +5,16 @@
 include(GetCPM)
 include(SimpleTr8nDeps)
 
+CPMUsePackageLock(package-lock.cmake)
+
+#===================================================================================================
+# IMPORTANT: Upon updating any dependencies below, regenerate package-lock.cmake with:
+#
+# # From simple-tr8n-cpp/ source directory (for existing CMake build):
+# $ cmake -D "SIMPLE_TR8N_STRING_VIEW_TYPE=lite" -D "SIMPLE_TR8N_ENABLE_TESTS=ON" build
+# $ cmake --build build --target cpm-update-package-lock
+#===================================================================================================
+
 CPMAddPackage(
     NAME gsl
     GIT_REPOSITORY https://github.com/microsoft/GSL
