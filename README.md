@@ -150,7 +150,7 @@ Libraries this one depends on (automatically downloaded during build via
 
 If you need to manage dependencies another way (*e.g.* using `vcpkg`, `conan`, or manually
 downloading all 3rd party libraries and checking them into your own company repositories), you can
-disable automatic dependency downloads by defining `CPM_USE_LOCAL_PACKAGES` when running `cmake`.
+disable automatic dependency downloads by defining `CPM_LOCAL_PACKAGES_ONLY` when running `cmake`.
 
 ## CMake Build Customization
 
