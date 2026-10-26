@@ -11,12 +11,12 @@
 #include <memory>
 #include <regex>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 #include <gsl/gsl>
 
-#include "simple_tr8n/string_view.hpp"
 #include "simple_tr8n/translator.hpp"
 
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
@@ -87,7 +87,7 @@ class MsgConfig {
 public:
   // Note: Intentionally allowing implicit type conversion syntax.
   /** Configures a message case without any plurals. */
-  MsgConfig(basic_string_view<CharT> msg) {
+  MsgConfig(std::basic_string_view<CharT> msg) {
     cases_.emplace_back(internal::kNoCount, std::basic_string<CharT>{msg});
   }
 
@@ -120,7 +120,8 @@ public:
   }
 
   /** Returns best matching message case value for the given plural count. */
-  const std::basic_string<CharT>& pluralCase(basic_string_view<CharT> msgType, int count) const {
+  const std::basic_string<CharT>& pluralCase(
+      std::basic_string_view<CharT> msgType, int count) const {
     Expects(count >= 0);
     Expects(hasPluralCases());
 
@@ -159,20 +160,20 @@ public:
   MsgConfigs& operator=(MsgConfigs&&) = delete;
 
   /** Adds message with just a single non-plural case. */
-  MsgConfigs& add(basic_string_view<CharT> msgType, basic_string_view<CharT> msg) {
+  MsgConfigs& add(std::basic_string_view<CharT> msgType, std::basic_string_view<CharT> msg) {
     configs_.emplace(msgType, MsgConfig<CharT>{msg});
     return *this;
   }
 
   /** Adds message with (potentially) multiple plural cases. */
   MsgConfigs& add(
-      basic_string_view<CharT> msgType, std::initializer_list<PluralCase<CharT>> cases) {
+      std::basic_string_view<CharT> msgType, std::initializer_list<PluralCase<CharT>> cases) {
     configs_.emplace(msgType, MsgConfig<CharT>{std::move(cases)});
     return *this;
   }
 
   /** Accesses the configuration for the given message type. */
-  const MsgConfig<CharT>& get(basic_string_view<CharT> msgType) const {
+  const MsgConfig<CharT>& get(std::basic_string_view<CharT> msgType) const {
     const auto itr = configs_.find(msgType);
 
     if (itr == configs_.end()) {
@@ -214,7 +215,7 @@ public:
   SimpleTranslator(SimpleTranslator&&) = delete;
   SimpleTranslator& operator=(SimpleTranslator&&) = delete;
 
-  string_type translate(basic_string_view<CharT> msgType) const override {
+  string_type translate(std::basic_string_view<CharT> msgType) const override {
     const auto& config = configs_->get(msgType);
 
     if (config.hasPluralCases()) {
@@ -233,7 +234,7 @@ public:
   }
 
   string_type translate(
-      basic_string_view<CharT> msgType, const TransArgs<CharT>& args) const override {
+      std::basic_string_view<CharT> msgType, const TransArgs<CharT>& args) const override {
     const auto& config = configs_->get(msgType);
 
     if (config.hasPluralCases()) {
@@ -244,7 +245,7 @@ public:
   }
 
   string_type translatePlural(
-      basic_string_view<CharT> msgType, int pluralCount,
+      std::basic_string_view<CharT> msgType, int pluralCount,
       const TransArgs<CharT>& args) const override {
     Expects(pluralCount >= 0);
     const auto& config = configs_->get(msgType);
@@ -259,7 +260,7 @@ public:
 private:
   using match_type = std::match_results<typename std::basic_string<CharT>::const_iterator>;
 
-  static string_type invalidArgs(basic_string_view<CharT> msgType) {
+  static string_type invalidArgs(std::basic_string_view<CharT> msgType) {
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
     throw InvalidArgsException<CharT>{msgType};
 #else
@@ -268,7 +269,8 @@ private:
 #endif
   }
 
-  static string_type missingArg(basic_string_view<CharT> msgType, basic_string_view<CharT> argKey) {
+  static string_type missingArg(
+      std::basic_string_view<CharT> msgType, std::basic_string_view<CharT> argKey) {
 #ifdef SIMPLE_TR8N_ENABLE_EXCEPTIONS
     throw MissingArgException<CharT>{msgType, argKey};
 #else
@@ -279,7 +281,7 @@ private:
   }
 
   string_type substituteArgs(
-      basic_string_view<CharT> msgType, const std::basic_string<CharT>& msg,
+      std::basic_string_view<CharT> msgType, const std::basic_string<CharT>& msg,
       const TransArgs<CharT>& args) const {
     // TODO: If needed, could improve efficiency here by reserving capacity
     // necessary to fit msg and argument values (TransArgs could track sum of lengths).

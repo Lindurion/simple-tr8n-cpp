@@ -8,11 +8,13 @@ SPDX-License-Identifier: Apache-2.0
 
 Really simple C++ header-only library for translating user-facing messages.
 Designed for C++ libraries that don't want to require their client applications
-to use any specific heavyweight i18n framework.
+to use any specific heavyweight internationalization (i18n) framework.
+
+Requires C++17 at minimum.
 
 Places all translation operations behind the `Translator` interface (declared
-[here](src/simple_tr8n/translator.hpp)). Clients of your library then have two
-options:
+in [translator.hpp](src/simple_tr8n/translator.hpp)). Clients of your library then
+have two options:
 
 1. Use the provided `SimpleTranslator` implementation.
 2. Provide their own implementation of `Translator`, which can then delegate to
@@ -28,18 +30,11 @@ features.
 ## How to Use in Your Library
 
 This project uses the [CMake](https://cmake.org/) build system. Any standard
-mechanism for depending on other CMake projects should work. The easiest
-technique for most projects will likely be using
-[FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html),
-which will download this library at a particular git commit and add its targets
-directly to your CMake project.
-
-```cmake
-FetchContent_Declare(SimpleTr8n
-    GIT_REPOSITORY https://github.com/Lindurion/simple-tr8n-cpp
-    GIT_TAG <REPLACE DESIRED GIT COMMIT HASH HERE>)
-FetchContent_MakeAvailable(SimpleTr8n)
-```
+mechanism for depending on other "modern" CMake projects should work. If you aren't
+already using another tool for dependency managment, see
+[Downloading And Building From Source With FetchContent](https://cmake.org/cmake/help/latest/guide/using-dependencies/index.html#downloading-and-building-from-source-with-fetchcontent)
+or
+[FetchContent And find_package() Integration](https://cmake.org/cmake/help/latest/guide/using-dependencies/index.html#fetchcontent-and-find-package-integration).
 
 You can then depend on the provided CMake targets:
 
@@ -65,13 +60,11 @@ good place to document arguments for interpolation.
 namespace your_project {
 namespace msgs {
 
-// (With C++17 or higher, all of these can also be declared inline).
-
 // Args: userFirstName, userAge.
-constexpr char kExampleMsgA[] = "your_project.a";
+inline constexpr char kExampleMsgA[] = "your_project.a";
 
 // Args: emailCount (plural).
-constexpr char kExampleMsgB[] = "your_project.b";
+inline constexpr char kExampleMsgB[] = "your_project.b";
 // ...
 
 }  // namespace msgs
@@ -135,22 +128,14 @@ const msgB = translator->translatePlural(msgs::kExampleMsgB, 3, {
 });
 ```
 
-## Dependencies and C++ Language Version Support
+## Dependencies
 
-This library supports C++14 and above. By default, however, it requires C++17
-to support `std::basic_string_view`.
-
-Libraries this one depends on (automatically downloaded during build via
-[CPM.cmake](https://github.com/cpm-cmake/CPM.cmake), which is a wrapper around `FetchContent`):
+Libraries this one depends on (by default downloaded and built via `FetchContent`,
+but consuming projects can provide these dependencies in other ways; see
+[CMake Using Dependencies Guide](https://cmake.org/cmake/help/latest/guide/using-dependencies/index.html)):
 
 * [microsoft/GSL: C++ Guidelines Support Library](https://github.com/microsoft/GSL)
-* [martinmoene/string-view-lite](https://github.com/martinmoene/string-view-lite):
-    optional dependency for a C++14 compatible version of `std::basic_string_view`.
 * [google/googletest](https://github.com/google/googletest): for tests only.
-
-If you need to manage dependencies another way (*e.g.* using `vcpkg`, `conan`, or manually
-downloading all 3rd party libraries and checking them into your own company repositories), you can
-disable automatic dependency downloads by defining `CPM_LOCAL_PACKAGES_ONLY` when running `cmake`.
 
 ## CMake Build Customization
 
@@ -159,13 +144,6 @@ that can be customized.
 
 * `SIMPLE_TR8N_ENABLE_EXCEPTIONS`: Enable C++ exceptions support?
   * If disabled, library will return empty strings instead of throwing exceptions.
-* `SIMPLE_TR8N_STRING_VIEW_TYPE`: Controls version of `basic_string_view`.
-  * `std` (default): Use `std::basic_string_view`, which requires C++17.
-  * `lite`: Use `string-view-lite` library for a C++14 compatible version.
-  * `custom`: Manually specify a different implementation (see below).
-* `SIMPLE_TR8N_STRING_VIEW_CUSTOM_TYPE`: *e.g.* `your_library::basic_string_view`
-* `SIMPLE_TR8N_STRING_VIEW_CUSTOM_INCLUDE`: *e.g.* `<your_library/basic_string_view.hpp>`
-* `SIMPLE_TR8N_STRING_VIEW_CUSTOM_TARGET`: CMake target, *e.g.* `your_library::string_view`
 
 ## Licenses
 
@@ -175,4 +153,4 @@ under the [Apache-2.0](LICENSES/Apache-2.0.txt) license. See
 software libraries, assets, and tools this project depends upon.
 
 Source files and `LICENSES/` are annotated and checked using
-[reuse.software](https://reuse.software/) tools.
+[reuse.software](https://reuse.software/) tools (run `reuse lint` to check this project).

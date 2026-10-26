@@ -22,7 +22,7 @@ function(simple_tr8n_header_library name)
   target_include_directories(SimpleTr8n_${name}
       INTERFACE ${SimpleTr8n_SOURCE_DIR}/src)
 
-  target_compile_features(SimpleTr8n_${name} INTERFACE cxx_std_14)
+  target_compile_features(SimpleTr8n_${name} INTERFACE cxx_std_17)
 endfunction()
 
 ## Configures target compile options to enable this project's standard set of
@@ -55,7 +55,7 @@ function(simple_tr8n_library name)
   target_include_directories(SimpleTr8n_${name}
       PUBLIC ${SimpleTr8n_SOURCE_DIR}/src)
 
-  target_compile_features(SimpleTr8n_${name} PUBLIC cxx_std_14)
+  target_compile_features(SimpleTr8n_${name} PUBLIC cxx_std_17)
   simple_tr8n_enable_warnings(${name})
 
   # TODO: Configure installation, if necessary.
@@ -80,7 +80,7 @@ function(simple_tr8n_gtest name)
   target_include_directories(SimpleTr8n_${name}
       PUBLIC ${SimpleTr8n_SOURCE_DIR}/src)
 
-  target_compile_features(SimpleTr8n_${name} PUBLIC cxx_std_14)
+  target_compile_features(SimpleTr8n_${name} PUBLIC cxx_std_17)
   simple_tr8n_enable_warnings(${name})
 
   target_link_libraries(SimpleTr8n_${name}

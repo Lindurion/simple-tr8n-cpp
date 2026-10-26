@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 if(NOT SIMPLE_TR8N_IS_TOP_LEVEL_PROJECT)
-  if(CMAKE_CXX_STANDARD LESS 14)
+  if(CMAKE_CXX_STANDARD LESS 17)
     message(FATAL_ERROR
-        "SimpleTr8n requires CMAKE_CXX_STANDARD >= 14 (got: ${CMAKE_CXX_STANDARD})")
+        "SimpleTr8n requires CMAKE_CXX_STANDARD >= 17 (got: ${CMAKE_CXX_STANDARD})")
   endif()
 
   return()  # Don't set these defaults if this isn't the top-level project.
@@ -17,12 +17,7 @@ endif()
 
 include(CheckCXXCompilerFlag)
 
-# C++ standard is determined by string_view type.
-if(SIMPLE_TR8N_STRING_VIEW_TYPE STREQUAL "std")
-  set(CMAKE_CXX_STANDARD 17)  # std::string_view requires C++17 minimum.
-else()
-  set(CMAKE_CXX_STANDARD 14)
-endif()
+set(CMAKE_CXX_STANDARD 17)
 
 # Default all compilers to hiding symbols by default.
 set(CMAKE_C_VISIBILITY_PRESET hidden)
