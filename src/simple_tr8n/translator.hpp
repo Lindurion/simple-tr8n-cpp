@@ -98,8 +98,7 @@ public:
    * Unused arguments are okay and should not result in an error.
    */
   virtual string_type translate(
-      std::basic_string_view<CharT> msgType, const TransArgs<CharT>& args) const
-      = 0;
+      std::basic_string_view<CharT> msgType, const TransArgs<CharT>& args) const = 0;
 
   /**
    * Translates the given plural message type, including argument interpolation.
@@ -114,8 +113,8 @@ public:
    * Unused arguments are okay and should not result in an error.
    */
   virtual string_type translatePlural(
-      std::basic_string_view<CharT> msgType, int pluralCount, const TransArgs<CharT>& args) const
-      = 0;
+      std::basic_string_view<CharT> msgType, int pluralCount,
+      const TransArgs<CharT>& args) const = 0;
 };
 
 }  // namespace simple_tr8n

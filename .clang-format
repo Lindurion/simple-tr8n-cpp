@@ -11,13 +11,15 @@ Language: Cpp
 AccessModifierOffset: -2
 AlignAfterOpenBracket: AlwaysBreak
 AlwaysBreakTemplateDeclarations: Yes
-BreakBeforeBinaryOperators: All
+BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Attach
 BreakBeforeTernaryOperators: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
+DerivePointerAlignment: false
 IncludeBlocks: Preserve
 IndentPPDirectives: BeforeHash
 NamespaceIndentation: None
 PackConstructorInitializers: BinPack
+PointerAlignment: Left
 SpaceAfterTemplateKeyword: false
 ...

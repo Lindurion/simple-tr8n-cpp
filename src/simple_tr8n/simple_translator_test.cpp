@@ -277,8 +277,9 @@ TEST_F(SimpleTranslatorCharTest, ShouldHandleErrorsPlural) {
     FAIL() << "Expecting MissingArgException";
   } catch (const simple_tr8n::MissingArgException<char>& e) {
     EXPECT_THAT(
-        e.what(), StrEq("simple_tr8n::MissingArgException: (msgType) "
-                        "test.couple_fish_count: (argKey) person2Name"));
+        e.what(), StrEq(
+                      "simple_tr8n::MissingArgException: (msgType) "
+                      "test.couple_fish_count: (argKey) person2Name"));
   }
 
   // No matching plural case (<= count):
